@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/CartProvider";
+import { SessionProvider } from "@/components/SessionProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,6 +19,11 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "REXIFY | Premium Shopping Experience",
   description: "Discover amazing deals on fashion, electronics, home goods, and more!",
+  icons: {
+    icon: "/window.svg",
+    shortcut: "/window.svg",
+    apple: "/window.svg",
+  },
 };
 
 export default function RootLayout({
@@ -31,7 +37,9 @@ export default function RootLayout({
       className={`${inter.variable} ${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <CartProvider>{children}</CartProvider>
+        <SessionProvider>
+          <CartProvider>{children}</CartProvider>
+        </SessionProvider>
       </body>
     </html>
   );
