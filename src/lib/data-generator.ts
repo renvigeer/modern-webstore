@@ -2,6 +2,7 @@ export interface Product {
   id: number;
   name: string;
   description: string;
+  about: string;
   price: number;
   originalPrice: number;
   category: string;
@@ -273,18 +274,30 @@ const generateProduct = (id: number, category: Category, subcategory: string): P
 
   const tags = [category.name, subcategory, color, material].filter(Boolean);
 
+  const numImages = 4 + Math.floor(Math.random() * 3);
+  const images: string[] = [];
+  for (let i = 0; i < numImages; i++) {
+    const randomId = 100 + Math.floor(Math.random() * 900);
+    images.push(`https://picsum.photos/800/800?random=${randomId}`);
+  }
+
+  const aboutSections = [
+    `Discover the exceptional quality of ${name}. Designed with precision and care, this product brings both style and functionality to your everyday life. Made from premium ${material}, it offers durability that lasts. Perfect for any occasion, whether you're heading out for a casual day or dressing up for something special. ${name} combines timeless design with modern comfort, making it a must-have addition to your collection.`,
+    `Elevate your lifestyle with ${name}. Crafted from high-quality ${material}, this piece features meticulous attention to detail and superior craftsmanship. The ${color} hue adds a touch of elegance, while the thoughtful design ensures maximum comfort. Whether you're using it daily or saving it for special moments, ${name} delivers exceptional value and style that stands the test of time.`,
+    `Experience the perfect blend of style and functionality with ${name}. This premium product is made from top-grade ${material}, ensuring durability and long-lasting performance. The versatile ${color} design complements any setting, making it ideal for both home and on-the-go use. With ${name}, you're not just buying a product – you're investing in quality that enhances your everyday experience.`,
+    `Introducing ${name} – where quality meets affordability. Made with premium ${material} and designed for lasting comfort, this product is perfect for anyone seeking style without compromise. The beautiful ${color} finish adds a touch of sophistication, while the thoughtful construction ensures everyday durability. Upgrade your essentials with ${name} and discover the difference true quality makes.`
+  ];
+
   return {
     id,
     name,
     description: `High-quality ${name.toLowerCase()} perfect for everyday use. Durable construction and stylish design. Great value for money!`,
+    about: aboutSections[Math.floor(Math.random() * aboutSections.length)],
     price: Math.round(price * 100) / 100,
     originalPrice: Math.round(originalPrice * 100) / 100,
     category: category.name,
     subcategory,
-    images: [
-      `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(name + " product photography white background")}&image_size=square`,
-      `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(name + " lifestyle photo")}&image_size=square`
-    ],
+    images,
     rating: 3.5 + Math.random() * 1.5,
     reviews: Math.floor(Math.random() * 5000),
     stock: Math.floor(Math.random() * 500),

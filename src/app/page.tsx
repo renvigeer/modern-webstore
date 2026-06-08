@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Heart, ShoppingCart, Menu, X, User, ChevronRight, Star, Truck, Shield, RefreshCw, Gift, ChevronLeft, Filter, Zap, Flame, TrendingUp, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { Search, Heart, ShoppingCart, Menu, X, User, ChevronRight, Star, Truck, Shield, RefreshCw, Gift, ChevronLeft, Filter, Zap, Flame, TrendingUp, Loader2, CheckCircle2, ArrowRight, LogOut, LayoutDashboard } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 interface Product {
@@ -59,6 +60,7 @@ const features = [
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeCategory, setActiveCategory] = useState("All");
   const [scrolled, setScrolled] = useState(false);
@@ -71,6 +73,7 @@ export default function Home() {
   const [addedProductIds, setAddedProductIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { cartCount, addToCart } = useCart();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -159,113 +162,226 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? "bg-white/98 backdrop-blur-xl shadow-2xl border-b border-slate-100" : "bg-white shadow-lg"}`}>
-        <div className="bg-gradient-to-r from-primary via-orange-600 to-accent text-white py-3">
-          <div className="max-w-7xl mx-auto px-4 text-center text-sm font-bold flex items-center justify-center gap-3">
-            <span className="animate-pulse">🎉</span>
-            Limited Time Offer: Free Shipping on All Orders Today!
-            <span className="ml-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">ENDS SOON!</span>
+      <header className={`fixed w-full z-50 transition-all duration-700 ${scrolled ? "bg-white/95 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border-b border-slate-100" : "bg-white shadow-xl"}`}>
+        {/* Announcement Bar */}
+        <div className="bg-gradient-to-r from-primary via-orange-600 via-red-500 to-accent text-white py-4 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 text-center font-extrabold flex items-center justify-center gap-4">
+            <span className="animate-bounce text-2xl">🚀</span>
+            <span className="text-lg tracking-wide">
+              LIMITED TIME! 50% OFF SUMMER COLLECTION + FREE SHIPPING
+            </span>
+            <span className="bg-white text-orange-600 px-4 py-2 rounded-full text-sm font-black shadow-lg animate-pulse">
+              🔥 HURRY UP!
+            </span>
           </div>
         </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24">
-            <div className="flex items-center gap-10">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-3 hover:bg-primary-light rounded-2xl transition-all duration-300 transform hover:scale-110">
+          <div className="flex items-center justify-between h-22">
+            <div className="flex items-center gap-8">
+              {/* Mobile Menu Button */}
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-3 hover:bg-primary-light rounded-2xl transition-all duration-300 transform hover:scale-105">
                 {isMenuOpen ? <X size={28} className="text-primary" /> : <Menu size={28} className="text-primary" />}
               </button>
+
+              {/* Logo */}
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary to-orange-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-all duration-300">
-                  <span className="text-white text-2xl font-black">R</span>
+                <div className="w-11 h-11 bg-gradient-to-br from-primary via-orange-600 to-accent rounded-xl flex items-center justify-center shadow-xl group-hover:shadow-primary/30 group-hover:scale-105 transition-all duration-400 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-pulse" />
+                  <span className="text-white text-2xl font-black relative z-10">R</span>
                 </div>
                 <div>
-                  <span className="text-4xl font-black bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent tracking-tight font-display group-hover:from-orange-600 group-hover:to-primary transition-all duration-300">
+                  <span className="text-3xl font-black bg-gradient-to-r from-primary via-orange-600 to-accent bg-clip-text text-transparent tracking-tight font-display group-hover:from-accent group-hover:via-orange-600 group-hover:to-primary transition-all duration-700">
                     REXIFY
                   </span>
                 </div>
               </Link>
-              <nav className="hidden lg:flex gap-10 items-center">
+
+              {/* Desktop Navigation */}
+              <nav className="hidden lg:flex gap-1 items-center">
                 {[
                   { label: "Home", href: "/" },
                   { label: "Categories", href: "/categories" },
-                  { label: "New Arrivals", href: "#" },
+                  { label: "News", href: "#", badge: "NEW" },
                   { label: "Bestsellers", href: "#" },
-                  { label: "Deals", href: "#" },
+                  { label: "Deals", href: "#", badge: "HOT" },
                   { label: "About", href: "#" }
                 ].map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="text-slate-700 hover:text-primary font-bold text-lg transition-all duration-300 relative group"
+                    className="relative px-4 py-2 text-slate-700 hover:text-primary font-bold text-base transition-all duration-300 rounded-xl group hover:bg-gradient-to-r from-primary-light/60 to-orange-100/60"
                   >
-                    {item.label}
-                    <span className="absolute -bottom-2 left-0 w-0 h-1.5 bg-gradient-to-r from-primary to-orange-600 transition-all duration-300 group-hover:w-full rounded-full" />
+                    <span className="relative z-10">{item.label}</span>
+                    {item.badge && (
+                      <span className={`absolute -top-1 -right-0.5 ${item.badge === 'HOT' ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'bg-gradient-to-r from-accent to-purple-600'} text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md`}>
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </nav>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="hidden md:flex items-center bg-gradient-to-r from-primary-light/70 to-orange-100/50 rounded-full px-6 py-4 w-[500px] border-2 border-transparent focus-within:border-primary focus-within:bg-white focus-within:shadow-2xl transition-all duration-300">
+
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-3">
+              {/* Search Bar */}
+              <div className="hidden md:flex items-center bg-gradient-to-r from-primary-light/60 to-orange-100/60 rounded-full px-6 py-3 w-[400px] border-2 border-transparent focus-within:border-primary focus-within:bg-white focus-within:shadow-xl focus-within:shadow-primary/20 transition-all duration-500">
                 <Search className="text-primary" size={22} />
                 <input
                   type="text"
-                  placeholder="Search for products, categories..."
+                  placeholder="Search products, brands, categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-transparent border-none outline-none flex-1 ml-4 text-base placeholder:text-slate-500"
                 />
               </div>
-              <div className="flex items-center gap-4">
-                <button className="relative p-4 hover:bg-primary-light rounded-2xl transition-all duration-300 group transform hover:scale-110">
-                  <Heart className="text-slate-600 group-hover:text-primary transition-colors" size={24} />
-                  <span className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[11px] font-black rounded-full w-6 h-6 flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300">
+
+              {/* Icons */}
+              <div className="flex items-center gap-2">
+                <button className="relative p-3 hover:bg-gradient-to-r from-primary-light to-orange-100 rounded-xl transition-all duration-300 group transform hover:scale-105">
+                  <Heart className="text-slate-600 group-hover:text-primary transition-colors" size={22} strokeWidth={2} />
+                  <span className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-rose-600 text-white text-[10px] font-black rounded-full w-6 h-6 flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300">
                     5
                   </span>
                 </button>
-                <Link href="/cart" className="relative p-4 hover:bg-primary-light rounded-2xl transition-all duration-300 group transform hover:scale-110">
-                  <ShoppingCart className="text-slate-600 group-hover:text-primary transition-colors" size={24} />
+
+                <Link href="/cart" className="relative p-3 hover:bg-gradient-to-r from-primary-light to-orange-100 rounded-xl transition-all duration-300 group transform hover:scale-105">
+                  <ShoppingCart className="text-slate-600 group-hover:text-primary transition-colors" size={22} strokeWidth={2} />
                   {cartCount > 0 && (
-                    <span className="absolute top-2 right-2 bg-gradient-to-r from-primary to-orange-600 text-white text-[11px] font-black rounded-full w-7 h-7 flex items-center justify-center shadow-lg animate-pulse group-hover:animate-none transition-all duration-300">
+                    <span className="absolute top-2 right-2 bg-gradient-to-r from-primary to-orange-600 text-white text-[10px] font-black rounded-full w-7 h-7 flex items-center justify-center shadow-lg animate-bounce group-hover:animate-none transition-all duration-300">
                       {cartCount}
                     </span>
                   )}
                 </Link>
-                <button className="p-4 hover:bg-primary-light rounded-2xl transition-all duration-300 group transform hover:scale-110 hidden sm:block">
-                  <User className="text-slate-600 group-hover:text-primary transition-colors" size={24} />
-                </button>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="p-3 hover:bg-gradient-to-r from-primary-light to-orange-100 rounded-xl transition-all duration-300 group transform hover:scale-105 flex items-center gap-2"
+                  >
+                    {session ? (
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white">
+                        {session.user?.name?.charAt(0) || "U"}
+                      </div>
+                    ) : (
+                      <User className="text-slate-600 group-hover:text-primary transition-colors" size={22} strokeWidth={2} />
+                    )}
+                  </button>
+
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-5 w-72 bg-white rounded-3xl shadow-[0_25px_50px_-12px_rgb(0,0,0,0.25)] border border-slate-100 overflow-hidden z-50 animate-slideInLeft">
+                      {session ? (
+                        <>
+                          <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-primary-light/30 to-orange-100/30">
+                            <p className="text-sm text-slate-600 font-semibold mb-1">Welcome back!</p>
+                            <p className="font-black text-slate-900 text-lg">{session.user?.name}</p>
+                            <p className="text-sm text-slate-500 font-medium">{session.user?.email}</p>
+                          </div>
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-4 px-6 py-4 text-slate-700 hover:bg-gradient-to-r from-primary-light to-orange-100 hover:text-primary transition-all duration-300 font-bold text-base"
+                          >
+                            <LayoutDashboard size={22} />
+                            My Dashboard
+                          </Link>
+                          <div className="h-px bg-slate-100 my-1" />
+                          <Link
+                            href="/cart"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-4 px-6 py-4 text-slate-700 hover:bg-gradient-to-r from-primary-light to-orange-100 hover:text-primary transition-all duration-300 font-bold text-base"
+                          >
+                            <ShoppingCart size={22} />
+                            My Orders
+                          </Link>
+                          <Link
+                            href="#"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-4 px-6 py-4 text-slate-700 hover:bg-gradient-to-r from-primary-light to-orange-100 hover:text-primary transition-all duration-300 font-bold text-base"
+                          >
+                            <Heart size={22} />
+                            Wishlist
+                          </Link>
+                          <div className="h-px bg-slate-100 my-1" />
+                          <button
+                            onClick={() => {
+                              signOut();
+                              setIsUserMenuOpen(false);
+                            }}
+                            className="w-full flex items-center gap-4 px-6 py-4 text-red-600 hover:bg-gradient-to-r from-red-50 to-rose-50 transition-all duration-300 font-extrabold text-base"
+                          >
+                            <LogOut size={22} />
+                            Sign Out
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="p-6 border-b border-slate-100">
+                            <p className="text-slate-700 font-extrabold text-lg">Welcome to REXIFY!</p>
+                          </div>
+                          <Link
+                            href="/login"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="block px-6 py-4 text-slate-700 hover:bg-gradient-to-r from-primary-light to-orange-100 hover:text-primary transition-all duration-300 font-extrabold text-base"
+                          >
+                            Sign In
+                          </Link>
+                          <Link
+                            href="/signup"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="block px-6 py-4 bg-gradient-to-r from-primary to-orange-600 text-white font-extrabold text-base hover:from-primary-dark hover:to-orange-700 transition-all duration-300"
+                          >
+                            Create Free Account
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-slate-100 animate-slideInLeft shadow-2xl">
-            <nav className="flex flex-col px-8 py-8 gap-6">
+          <div className="lg:hidden bg-white border-t border-slate-100 animate-slideInLeft shadow-[0_20px_50px_-12px_rgb(0,0,0,0.15)]">
+            <nav className="flex flex-col px-6 py-6 gap-3">
               {[
                 { label: "Home", href: "/" },
                 { label: "Categories", href: "/categories" },
-                { label: "New Arrivals", href: "#" },
+                { label: "News", href: "#", badge: "NEW" },
                 { label: "Bestsellers", href: "#" },
-                { label: "Deals", href: "#" },
+                { label: "Deals", href: "#", badge: "HOT" },
                 { label: "About", href: "#" }
               ].map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-slate-800 font-black py-4 hover:text-primary hover:bg-gradient-to-r from-primary-light/50 to-orange-100 rounded-2xl px-6 transition-all duration-300 text-xl flex items-center justify-between"
+                  className="text-slate-800 font-bold py-4 px-5 hover:text-primary hover:bg-gradient-to-r from-primary-light/50 to-orange-100/50 rounded-xl transition-all duration-300 text-lg flex items-center justify-between relative"
                 >
-                  {item.label}
+                  <span className="flex items-center gap-2">
+                    {item.label}
+                    {item.badge && (
+                      <span className={`${item.badge === 'HOT' ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'bg-gradient-to-r from-accent to-purple-600'} text-white text-[9px] font-black px-1.5 py-0.5 rounded-full`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
                   <ChevronRight size={20} className="text-slate-400" />
                 </Link>
               ))}
               <div className="md:hidden mt-4">
-                <div className="flex items-center bg-gradient-to-r from-primary-light/50 to-orange-100/50 rounded-full px-6 py-4 border-2 border-primary/20">
-                  <Search className="text-primary" size={22} />
+                <div className="flex items-center bg-gradient-to-r from-primary-light/60 to-orange-100/60 rounded-full px-6 py-4 border-2 border-primary/30">
+                  <Search className="text-primary" size={20} />
                   <input
                     type="text"
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent border-none outline-none flex-1 ml-4 text-base placeholder:text-slate-500"
+                    className="bg-transparent border-none outline-none flex-1 ml-4 text-sm placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -274,7 +390,7 @@ export default function Home() {
         )}
       </header>
 
-      <main className="pt-56">
+      <main className="pt-52">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
           <div className="relative rounded-3xl overflow-hidden h-[550px] shadow-2xl group">
             {slides.map((slide, index) => (

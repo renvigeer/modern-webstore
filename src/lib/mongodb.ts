@@ -2,10 +2,6 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/eco';
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
 declare global {
   var mongoose: {
     conn: any;
@@ -29,11 +25,24 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log('Connected to MongoDB successfully!');
+        return mongoose;
+      })
+      .catch((error) => {
+        console.warn('MongoDB connection failed, falling back to in-memory mode:', error.message);
+        cached.promise = null;
+        return null;
+      });
   }
-  cached.conn = await cached.promise;
+  
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.conn = null;
+  }
+  
   return cached.conn;
 }
 

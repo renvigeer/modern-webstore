@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, ChevronRight, Star, Filter, Loader2, ShoppingCart, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Star, ShoppingCart, CheckCircle2 } from "lucide-react";
 import { categories } from "@/lib/data-generator";
 import { useCart } from "@/context/CartContext";
 
@@ -33,7 +33,7 @@ export default function CategoryPage() {
   const [addedProductIds, setAddedProductIds] = useState<number[]>([]);
   const { addToCart } = useCart();
 
-  const category = categories.find(c => c.id === categoryId) || categories[0];
+  const category = categories.find((c) => c.id === categoryId) || categories[0];
 
   useEffect(() => {
     fetchProducts();
@@ -46,7 +46,7 @@ export default function CategoryPage() {
         category: category.name,
         sort: sortBy,
         page: currentPage.toString(),
-        limit: "24"
+        limit: "24",
       });
       if (currentSubcategory) {
         params.set("subcategory", currentSubcategory);
@@ -54,7 +54,7 @@ export default function CategoryPage() {
 
       const res = await fetch(`/api/products?${params}`);
       const data = await res.json();
-      
+
       // Apply client-side price filtering
       let filtered = data.products;
       if (priceRange[0] > 0 || priceRange[1] < 500) {
@@ -62,7 +62,7 @@ export default function CategoryPage() {
           (p: Product) => p.price >= priceRange[0] && p.price <= priceRange[1]
         );
       }
-      
+
       setProducts(filtered);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -110,14 +110,21 @@ export default function CategoryPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <nav className="flex items-center gap-3 text-sm text-slate-500 mb-10">
-          <Link href="/" className="hover:text-primary font-medium transition-colors">Home</Link>
+          <Link href="/" className="hover:text-primary font-medium transition-colors">
+            Home
+          </Link>
           <ChevronRight size={18} />
-          <Link href="/categories" className="hover:text-primary font-medium transition-colors">Categories</Link>
+          <Link href="/categories" className="hover:text-primary font-medium transition-colors">
+            Categories
+          </Link>
           <ChevronRight size={18} />
           <span className="text-slate-800 font-bold">{category.name}</span>
         </nav>
 
-        <Link href="/categories" className="flex items-center gap-3 text-slate-600 hover:text-primary mb-8 transition-colors font-medium text-lg">
+        <Link
+          href="/categories"
+          className="flex items-center gap-3 text-slate-600 hover:text-primary mb-8 transition-colors font-medium text-lg"
+        >
           <ArrowLeft size={22} />
           <span>Back to Categories</span>
         </Link>
@@ -162,73 +169,13 @@ export default function CategoryPage() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-5">
           <p className="text-slate-600 text-lg font-medium">
-            {loading ? "Loading products..." : `${products.length} products found"}
+            {loading ? "Loading products..." : `${products.length} products found`}
           </p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-3 px-6 py-3.5 bg-white border-2 border-slate-200 rounded-2xl hover:border-primary hover:text-primary transition-all duration-300 font-semibold"
-            >
-              <Filter size={20} />
-              Filters
-            </button>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-white border-2 border-slate-200 rounded-2xl px-6 py-3.5 text-base font-semibold"
-            >
-              <option value="newest">Newest First</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
-              <option value="reviews">Most Reviews</option>
-            </select>
-          </div>
         </div>
-
-        {showFilters && (
-          <div className="bg-white rounded-3xl p-8 shadow-xl mb-12 border border-slate-100">
-            <h3 className="font-black text-slate-900 mb-6 text-xl">Price Range</h3>
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="text-base text-slate-600 block mb-3 font-medium">Min Price ($)</label>
-                  <input
-                    type="number"
-                    value={priceRange[0]}
-                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                    className="w-full px-6 py-4 border-2 border-slate-200 rounded-2xl focus:border-primary focus:outline-none transition-all"
-                    min="0"
-                    max="500"
-                  />
-                </div>
-                <div>
-                  <label className="text-base text-slate-600 block mb-3 font-medium">Max Price ($)</label>
-                  <input
-                    type="number"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                    className="w-full px-6 py-4 border-2 border-slate-200 rounded-2xl focus:border-primary focus:outline-none transition-all"
-                    min="0"
-                    max="500"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setPriceRange([0, 500])}
-                  className="text-primary font-semibold hover:underline text-lg"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <Loader2 className="animate-spin text-primary" size={64} />
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent"></div>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-16">
@@ -258,7 +205,10 @@ export default function CategoryPage() {
                     )}
                   </div>
                   <div className="absolute bottom-5 left-5 right-5 opacity-0 group-hover:opacity-100 transition-all duration-400 transform translate-y-6 group-hover:translate-y-0 flex gap-3">
-                    <Link href={`/product/${product.id}`} className="flex-1 bg-white text-primary font-bold py-4 rounded-2xl shadow-xl hover:bg-primary-light/30 transition-all duration-300 text-center">
+                    <Link
+                      href={`/product/${product.id}`}
+                      className="flex-1 bg-white text-primary font-bold py-4 rounded-2xl shadow-xl hover:bg-primary-light/30 transition-all duration-300 text-center"
+                    >
                       View
                     </Link>
                     <button
@@ -301,8 +251,12 @@ export default function CategoryPage() {
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-4">
-                    <span className="text-2xl font-black bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent">${product.price.toFixed(2)}</span>
-                    <span className="text-slate-400 line-through text-sm font-semibold">${product.originalPrice.toFixed(2)}</span>
+                    <span className="text-2xl font-black bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent">
+                      ${product.price.toFixed(2)}
+                    </span>
+                    <span className="text-slate-400 line-through text-sm font-semibold">
+                      ${product.originalPrice.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -312,11 +266,10 @@ export default function CategoryPage() {
 
         <div className="bg-gradient-to-r from-primary via-orange-600 to-accent py-20 rounded-3xl text-white text-center mx-4 lg:mx-0">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl font-black mb-6 font-display animate-float">
-              Don't Miss Out!
-            </h2>
+            <h2 className="text-4xl font-black mb-6 font-display">Don&apos;t Miss Out!</h2>
             <p className="text-white/95 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
-              Get exclusive deals and updates on new {category.name.toLowerCase()} arrivals by subscribing to our newsletter.
+              Get exclusive deals and updates on new {category.name.toLowerCase()} arrivals by subscribing to our
+              newsletter.
             </p>
             <div className="flex flex-col sm:flex-row gap-5 max-w-2xl mx-auto">
               <input

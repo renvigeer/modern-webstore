@@ -9,6 +9,7 @@ interface Product {
   id: number;
   name: string;
   description: string;
+  about: string;
   price: number;
   originalPrice: number;
   category: string;
@@ -141,7 +142,7 @@ export default function ProductPage() {
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-4 gap-5">
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-4">
               {product.images.map((img, index) => (
                 <button
                   key={index}
@@ -194,6 +195,16 @@ export default function ProductPage() {
             </div>
 
             <p className="text-slate-600 text-xl mb-10 leading-relaxed">{product.description}</p>
+            
+            <div className="bg-gradient-to-br from-primary-light/30 to-orange-50 rounded-3xl p-8 border border-primary/10 mb-10">
+              <h3 className="font-black text-slate-900 mb-4 text-xl flex items-center gap-3">
+                <span className="w-10 h-10 bg-gradient-to-r from-primary to-orange-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-black">!</span>
+                </span>
+                About This Product
+              </h3>
+              <p className="text-slate-700 text-lg leading-relaxed">{product.about}</p>
+            </div>
             
             <div className="grid grid-cols-3 gap-6 mb-10">
               <div className="bg-primary-light/50 p-6 rounded-2xl flex items-center gap-4 border border-primary/10">
