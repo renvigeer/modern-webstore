@@ -1,10 +1,14 @@
 "use client";
 import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Shield, Truck, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { useCart } from "@/context/CartContext";
+import { useCartStore } from "@/store/cart-store";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
+  const cart = useCartStore((s) => s.cart);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const removeFromCart = useCartStore((s) => s.removeFromCart);
+  const cartTotal = useCartStore((s) => s.cartTotal);
+  const clearCart = useCartStore((s) => s.clearCart);
 
   const subtotal = cartTotal;
   const shipping = subtotal > 50 ? 0 : 9.99;

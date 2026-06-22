@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, ChevronRight, Star, ShoppingCart, CheckCircle2 } from "lucide-react";
 import { categories } from "@/lib/data-generator";
-import { useCart } from "@/context/CartContext";
+import { useCartStore } from "@/store/cart-store";
 
 interface Product {
   id: number;
@@ -31,7 +31,7 @@ export default function CategoryPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [showFilters, setShowFilters] = useState(false);
   const [addedProductIds, setAddedProductIds] = useState<number[]>([]);
-  const { addToCart } = useCart();
+  const addToCart = useCartStore((s) => s.addToCart);
 
   const category = categories.find((c) => c.id === categoryId) || categories[0];
 

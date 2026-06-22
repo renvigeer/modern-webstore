@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { generateProducts, categories } from '@/lib/data-generator';
+import { generateProducts } from '@/lib/data-generator';
 
-let products = generateProducts(2000);
+const products = generateProducts(2000);
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,6 +11,9 @@ export async function GET(request: Request) {
   const page = parseInt(searchParams.get('page') || '1');
   const limit = parseInt(searchParams.get('limit') || '24');
   const sort = searchParams.get('sort') || 'newest';
+  const isNew = searchParams.get('isNew');
+  const isBestseller = searchParams.get('isBestseller');
+  const minDiscount = searchParams.get('minDiscount');
 
   let filteredProducts = [...products];
 
@@ -29,6 +32,22 @@ export async function GET(request: Request) {
       p.description.toLowerCase().includes(searchLower) ||
       p.tags.some(tag => tag.toLowerCase().includes(searchLower))
     );
+  }
+
+  if (isNew === 'true') {
+    filteredProducts = filteredProducts.filter(p => p.isNew);
+  }
+
+  if (isBestseller === 'true') {
+    filteredProducts = filteredProducts.filter(p => p.isBestseller);
+  }
+
+  if (minDiscount) {
+    const discount = parseInt(minDiscount);
+    filteredProducts = filteredProducts.filter(p => {
+      const d = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+      return d >= discount;
+    });
   }
 
   switch (sort) {

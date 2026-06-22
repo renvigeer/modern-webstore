@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { ShoppingCart, Heart, Star, ChevronRight, Plus, Minus, Share2, Shield, Truck, RefreshCw, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCart } from "@/context/CartContext";
+import { useCartStore } from "@/store/cart-store";
 
 interface Product {
   id: number;
@@ -33,7 +33,7 @@ export default function ProductPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState(false);
-  const { addToCart } = useCart();
+  const addToCart = useCartStore((s) => s.addToCart);
 
   useEffect(() => {
     fetchProduct();
